@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Invoices</title>
+  <!-- Bootstrap CSS -->
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+  <!-- static css -->
+  <link rel="stylesheet" href="../static/style.css">
+
+  <!-- Link to jQuery  -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+
+  <link rel="stylesheet" href="//code.jquery.com/ui/1.13.1/themes/base/jquery-ui.css">
+  <script src="https://code.jquery.com/jquery-3.6.0.js"></script>
+  <script src="https://code.jquery.com/ui/1.13.1/jquery-ui.js"></script>
+</head>
+
+<body>
+  <div class="navbar">
+    <img class="logo" src="../static/logo" alt="Logo" />
+  </div>
+  <div class="container">
+    <div class="filter">
+      <p>Start Date: <input type="text" id="start_date_picker" value="01/01/2020"></p>
+      <p>End Date: <input type="text" id="end_date_picker"></p>
+    </div>
+    <div>
+      <div id="loading">Loading...</div>
+      <div>{{ error_message }}</div>
+      <table class="invoice-table">
+        <thead>
+          <tr>
+            <th>No</th>
+            <th>State</th>
+            <th>Date</th>
+            <th>Due Date</th>
+            <th>Partner</th>
+            <th>Amount</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for invoice in invoices %}
+          <tr id="invoice{{ invoice['number'] }}" class="invoice-row" data-id="{{ invoice['number'] }}">
+            <td>{{ invoice['number'] }}</td>
+            <td>{{ invoice['state'] }}</td>
+            <td>{{ invoice['date_invoice'] }}</td>
+            <td>{{ invoice['due_invoice'] }}</td>
+            <td>{{ invoice['partner_name'] }}</td>
+            <td>{{ invoice['amount'] }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <script>
+    function padTo2Digits(num) {
+      return num.toString().padStart(2, '0');
+    }
+
+    function formatDate(date) {
+      return (
+        [
+          date.getFullYear(),
+          padTo2Digits(date.getMonth() + 1),
+          padTo2Digits(date.getDate()),
+        ].join('-') +
+        ' ' +
+        [
+          padTo2Digits(date.getHours()),
+          padTo2Digits(date.getMinutes()),
+          padTo2Digits(date.getSeconds()),
+        ].join(':')
+      );
+    }
+
+    function updateInvoiceTable(data, isFirst) {
+      if (!isFirst) {
+        let tbodyContent = '';
+        data.forEach(invoice => {
+          tbodyContent += '<tr id="invoice' + invoice['number'] +  '" class="invoice-row" data-id="' + invoice['number'] + '">';
+          tbodyContent += '<td>' + invoice['number'] + '</td>';
+          tbodyContent += '<td>' + invoice['state'] + '</td>';
+          tbodyContent += '<td>' + invoice['date_invoice'] + '</td>';
+          tbodyContent += '<td>' + invoice['due_invoice'] + '</td>';
+          tbodyContent += '<td>' + invoice['partner_name'] + '</td>';
+          tbodyContent += '<td>' + invoice['amount'] + '</td></tr>';
+        })
+        $("tbody").html(tbodyContent);
+      }
+      $("#loading").css('visibility', 'hidden');
+      $(".invoice-table").css('visibility', 'visible');
+    }
+
+    function onChange(start, end, isFirst) {
+      $(".invoice-table").css('visibility', 'hidden');
+      $("#loading").css('visibility', 'visible');
+      $.ajax({
+        url: `/invoice?date_from=${start}&date_to=${end}&is_first=${isFirst}`,
+        type: 'GET',
+        success: function(data) {
+          updateInvoiceTable(data, isFirst);
+        }
+      });
+    }
+
+    $(document).ready(function() {
+      let startDate = '2020-01-01 00:00:00';
+      let endDate = '2020-07-31 00:00:00';
+      let isFirst = true;
+      
+      $(function() {
+        $("#start_date_picker").datepicker();
+      });
+
+      $(function() {
+        $("#end_date_picker").datepicker();
+      });
+
+      $('#start_date_picker').change(function() {
+        startDate = formatDate($(this).datepicker('getDate'));
+
+        onChange(startDate, endDate, isFirst);
+
+        if (isFirst) isFirst = false;
+      });
+
+      $('#end_date_picker').change(function() {
+        endDate = formatDate($(this).datepicker('getDate'));
+
+        onChange(startDate, endDate, isFirst);
+
+        if (isFirst) isFirst = false;
+      });
+
+      onChange(startDate, endDate, isFirst);
+      if (isFirst) isFirst = false;
+    });
+  </script>
+
+  <!-- BOOTSTRAP'S: Optional JavaScript -->
+  <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+
+  <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js" integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6" crossorigin="anonymous"></script>
+
+</body>
+
+</html>

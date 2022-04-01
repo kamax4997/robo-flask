@@ -1,0 +1,88 @@
+body {font-family: Arial, Helvetica, sans-serif;}
+
+.navbar {
+  width: 100%;
+  display: block;
+  overflow: auto;
+  box-shadow: 0 2px 8px rgb(0 0 0 / 20%);
+}
+
+.navbar a {
+  float: left;
+  padding: 12px;
+  color: white;
+  text-decoration: none;
+  font-size: 16px;
+}
+
+.navbar a:hover {
+  background-color: #000;
+}
+
+.nav-button {
+  margin-right: 12px;
+}
+
+@media screen and (max-width: 500px) {
+  .navbar a {
+    float: none;
+    display: block;
+  }
+}
+
+.invoice-table {
+  margin-top: 1rem;
+  margin-bottom: 2rem;
+}
+
+table {
+  border-collapse: collapse;
+  border-spacing: 0;
+  width: 100%;
+  border: 1px solid #ddd;
+  border-radius: 12px;
+}
+
+thead tr {
+  background: #36304a;
+  color: white;
+}
+
+th, td {
+  text-align: left;
+  padding: 8px;
+}
+
+tr:nth-child(even) {
+  background-color: #f2f2f2
+}
+
+.filter {
+  display: flex;
+  margin-top: 2rem;
+  justify-content: space-between;
+}
+
+.filter p {
+  margin-left: 2rem;
+}
+
+#loading {
+  visibility: hidden;
+  text-align: center;
+  font-size: 24px;
+}
+
+.logo {
+  width: 120px;
+  margin: 8px;
+  cursor: pointer;
+}
+
+#start_date_picker {
+  border-radius: 4px;
+}
+
+#end_date_picker {
+  border-radius: 4px;
+}
